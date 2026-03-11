@@ -23,6 +23,7 @@ interface AuthContextValue {
   signInWithMagicLink: (
     email: string,
   ) => Promise<{ error: string | null }>;
+  signInWithGoogle: () => Promise<{ error: string | null }>;
   signUp: (
     email: string,
     password: string,
@@ -112,6 +113,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error: error?.message ?? null };
   }, []);
 
+  const signInWithGoogle = useCallback(async () => {
+    if (!supabase) return { error: "Supabase is not configured" };
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
+    });
+    return { error: error?.message ?? null };
+  }, []);
+
   const signUp = useCallback(
     async (email: string, password: string, fullName: string) => {
       if (!supabase) return { error: "Supabase is not configured" };
@@ -141,6 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isConfigured,
       signInWithPassword,
       signInWithMagicLink,
+      signInWithGoogle,
       signUp,
       signOut: handleSignOut,
     }),
@@ -152,6 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isConfigured,
       signInWithPassword,
       signInWithMagicLink,
+      signInWithGoogle,
       signUp,
       handleSignOut,
     ],
