@@ -30,7 +30,18 @@ export function ProtectedRoute({ requiredRole, children }: ProtectedRouteProps) 
 
   if (requiredRole) {
     const allowed = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-    if (!role || !allowed.includes(role)) {
+
+    // Session exists but profile/role hasn't loaded yet — keep showing spinner
+    // instead of briefly flashing "Access Denied" during bootstrap.
+    if (!role) {
+      return (
+        <div className="flex items-center justify-center h-full min-h-[60vh]">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </div>
+      );
+    }
+
+    if (!allowed.includes(role)) {
       return (
         <div className="flex items-center justify-center h-full min-h-[60vh]">
           <div className="text-center space-y-4 max-w-sm">

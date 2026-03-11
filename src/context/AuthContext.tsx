@@ -62,10 +62,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    supabase.auth.getSession().then(({ data: { session: initial } }) => {
-      setSession(initial);
-      setIsLoading(false);
-    });
+    supabase.auth.getSession().then(
+      ({ data: { session: initial } }) => {
+        setSession(initial);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error("Failed to restore session:", err);
+        setIsLoading(false);
+      },
+    );
 
     // 2. Listen for auth changes (sign-in, sign-out, token refresh)
     //    Keep this callback lightweight — no async work here.
