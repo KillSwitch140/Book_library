@@ -268,7 +268,7 @@ const BookDetailPage = () => {
                       <BookOpen className="w-4 h-4" />
                       {book.available ? "Issue Borrow" : "Unavailable"}
                     </Button>
-                    {!book.available && (
+                    {book.availableCopies < book.copies && (
                       <Button
                         variant="outline"
                         size="lg"
