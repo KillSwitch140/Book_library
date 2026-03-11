@@ -1,0 +1,146 @@
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
+import type { Session } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
+import type { DbProfile, UserRole } from "@/types";
+
+interface AuthContextValue {
+  session: Session | null;
+  profile: DbProfile | null;
+  role: UserRole | null;
+  isLoading: boolean;
+  isConfigured: boolean;
+  signInWithPassword: (
+    email: string,
+    password: string,
+  ) => Promise<{ error: string | null }>;
+  signInWithMagicLink: (
+    email: string,
+  ) => Promise<{ error: string | null }>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName: string,
+  ) => Promise<{ error: string | null }>;
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<DbProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const isConfigured = supabase !== null;
+
+  const fetchProfile = useCallback(async (userId: string) => {
+    if (!supabase) return;
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .single();
+    setProfile(data);
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) {
+      setIsLoading(false);
+      return;
+    }
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      setSession(newSession);
+      if (newSession?.user) {
+        await fetchProfile(newSession.user.id);
+      } else {
+        setProfile(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [fetchProfile]);
+
+  const signInWithPassword = useCallback(
+    async (email: string, password: string) => {
+      if (!supabase) return { error: "Supabase is not configured" };
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return { error: error?.message ?? null };
+    },
+    [],
+  );
+
+  const signInWithMagicLink = useCallback(async (email: string) => {
+    if (!supabase) return { error: "Supabase is not configured" };
+    const { error } = await supabase.auth.signInWithOtp({ email });
+    return { error: error?.message ?? null };
+  }, []);
+
+  const signUp = useCallback(
+    async (email: string, password: string, fullName: string) => {
+      if (!supabase) return { error: "Supabase is not configured" };
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: fullName } },
+      });
+      return { error: error?.message ?? null };
+    },
+    [],
+  );
+
+  const handleSignOut = useCallback(async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+  }, []);
+
+  const role: UserRole | null = profile?.role ?? null;
+
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      session,
+      profile,
+      role,
+      isLoading,
+      isConfigured,
+      signInWithPassword,
+      signInWithMagicLink,
+      signUp,
+      signOut: handleSignOut,
+    }),
+    [
+      session,
+      profile,
+      role,
+      isLoading,
+      isConfigured,
+      signInWithPassword,
+      signInWithMagicLink,
+      signUp,
+      handleSignOut,
+    ],
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth(): AuthContextValue {
+  const ctx = useContext(AuthContext);
+  if (ctx === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return ctx;
+}
