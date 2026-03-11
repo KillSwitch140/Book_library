@@ -101,6 +101,14 @@ The distinction is intentional: day-to-day librarians handle circulation and cat
 
 Members can reserve books that are currently unavailable. The system tracks queue position so members know where they stand, rather than having to repeatedly check the catalog.
 
+### Copy-Level Inventory
+
+Each book can have multiple physical copies rather than a single availability flag.
+
+- Staff can add or remove individual copies.
+- Each copy tracks its own availability and condition.
+
+This makes the catalog behave more like a real physical library.
 
 ### Admin Dashboard
 
