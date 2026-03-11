@@ -45,9 +45,8 @@ export async function fetchBooks(opts: FetchBooksOpts = {}): Promise<BookView[]>
 
   query = query.order(sortField, { ascending: sortDir === "asc" });
 
-  if (limit) {
-    query = query.limit(limit);
-  }
+  // Always cap results to avoid huge payloads (especially with nested copies)
+  query = query.limit(limit ?? 100);
 
   const { data, error } = await query;
   if (error) throw error;

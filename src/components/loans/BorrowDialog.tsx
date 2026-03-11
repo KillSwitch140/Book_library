@@ -55,7 +55,8 @@ export default function BorrowDialog({
       setMemberResults([]);
       setDaysLoan(14);
     }
-  }, [open, availableCopies]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only reset when dialog opens, not on every render
+  }, [open]);
 
   // Member search with debounce
   useEffect(() => {
