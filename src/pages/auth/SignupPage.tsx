@@ -48,14 +48,14 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-6">
         {/* Branding */}
-        <div className="flex flex-col items-center gap-3">
+        <Link to="/" className="flex flex-col items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-gradient-warm flex items-center justify-center shadow-glow">
             <BookMarked className="w-6 h-6 text-primary-foreground" />
           </div>
           <h1 className="font-display text-2xl font-bold text-foreground">
             Athenaeum
           </h1>
-        </div>
+        </Link>
 
         {!isConfigured ? (
           <Card>

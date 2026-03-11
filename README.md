@@ -1,71 +1,17 @@
 # Athenaeum
 
-A premium digital library management system with catalog browsing, staff-mediated circulation, member reservations, and AI-powered book insights.
+A premium digital library management system with book catalog, staff-mediated circulation, member reservations, and AI-powered book insights.
 
-Built as a full-stack SPA with React, Supabase, and OpenAI — deployed on Vercel.
+## Live Demo
 
-## Features
+**URL:** https://book-library-ganesh.vercel.app
 
-**Catalog & Discovery**
-- Browse books by genre with cover art, ratings, and availability badges
-- Full-text search across titles, authors, and ISBNs
-- Book detail pages with metadata, copy availability, and loan history
+| Role | Email | Password |
+|---|---|---|
+| Staff (librarian) | alice@example.com | TestPass123! |
+| Member | bob@example.com | TestPass123! |
 
-**Circulation (Staff-Mediated)**
-- Staff can issue borrows by searching members and selecting available copies
-- Staff can process returns with overdue detection
-- Members see their active loans and can request renewals
-
-**Reservations**
-- Members can reserve books and join a queue
-- Queue position and estimated availability shown
-- Cancel reservations at any time
-
-**AI Book Insights**
-- On-demand, AI-generated insights for any book in the catalog
-- Powered by GPT-4o-mini via a Vercel serverless function
-- Generates: summary, best-for audience, tone, themes, and a "why read it" recommendation
-- Cached in the database — subsequent visits load instantly without re-calling the API
-- Prompt hash tracks metadata changes so insights regenerate only when the book record changes
-- Solves a real problem: helps borrowers make informed decisions from catalog metadata alone
-
-**Admin & Roles**
-- Three roles: `admin`, `librarian`, `member`
-- Admin dashboard with book/loan/member stats
-- Catalog management: add, edit, archive books and manage physical copies
-- Role-based route protection and UI gating
-
-**Auth**
-- Email/password and magic link sign-in via Supabase Auth
-- Session persists across page reloads
-- Protected routes redirect to login with return URL
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | React 18 + TypeScript |
-| Build | Vite |
-| Routing | React Router v6 |
-| Data Fetching | TanStack Query v5 |
-| Database | Supabase (PostgreSQL + Auth + RLS) |
-| UI Components | shadcn/ui (Radix primitives) |
-| Styling | Tailwind CSS with custom dark theme |
-| Forms | react-hook-form + Zod validation |
-| AI | OpenAI GPT-4o-mini (structured output) |
-| E2E Testing | Playwright |
-| Unit Testing | Vitest |
-| Deployment | Vercel |
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- A [Supabase](https://supabase.com) project
-- An [OpenAI API key](https://platform.openai.com/api-keys) (for AI insights)
-
-### Install
+## How to Run Locally
 
 ```bash
 git clone https://github.com/KillSwitch140/Book_library.git
@@ -73,9 +19,7 @@ cd Book_library
 npm install
 ```
 
-### Environment Variables
-
-Create `.env.local` in the project root:
+Create `.env.local`:
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -84,123 +28,81 @@ SUPABASE_SERVICE_KEY=your-service-role-key
 OPENAI_API_KEY=sk-your-openai-key
 ```
 
-| Variable | Side | Where to find it |
-|---|---|---|
-| `VITE_SUPABASE_URL` | Client | Supabase Dashboard > Project Settings > API > Project URL |
-| `VITE_SUPABASE_ANON_KEY` | Client | Supabase Dashboard > Project Settings > API > `anon` `public` key |
-| `SUPABASE_SERVICE_KEY` | Server | Supabase Dashboard > Project Settings > API > `service_role` `secret` key |
-| `OPENAI_API_KEY` | Server | OpenAI Platform > API Keys |
-
-Client-side variables (`VITE_` prefix) are bundled into the browser build. Server-side variables are only available in Vercel serverless functions.
-
-### Database Setup
-
-Run the two migration files in order in the **Supabase SQL Editor**:
-
-1. `supabase/migrations/00001_initial_schema.sql` — core tables, indexes, RLS, triggers
-2. `supabase/migrations/00002_book_ai_insights.sql` — AI insights cache table
-
-### Test Accounts
-
-Create accounts through the app's signup page (`/signup`), then promote staff via SQL:
-
-```sql
-UPDATE public.profiles SET role = 'librarian' WHERE email = 'alice@example.com';
-```
-
-Members default to `role = 'member'` — no promotion needed.
-
-### Run Locally
+Run the two migration files in **Supabase SQL Editor**:
+1. `supabase/migrations/00001_initial_schema.sql`
+2. `supabase/migrations/00002_book_ai_insights.sql`
 
 ```bash
 npm run dev    # Starts on http://localhost:8080
 ```
 
-> **Note:** AI insights require the `/api/generate-insights` serverless function, which only runs on Vercel. Use `vercel dev` for local development with serverless functions.
+## Tech Stack
 
-## Running Tests
-
-### Unit Tests
-
-```bash
-npm run test          # Single run
-npm run test:watch    # Watch mode
-```
-
-### E2E Tests (Playwright)
-
-**Setup:**
-
-1. Install browsers: `npx playwright install chromium`
-2. Configure test accounts in `.env.e2e`:
-
-```env
-PLAYWRIGHT_BASE_URL=http://localhost:8080
-TEST_STAFF_EMAIL=alice@example.com
-TEST_STAFF_PASSWORD=TestPass123!
-TEST_MEMBER_EMAIL=bob@example.com
-TEST_MEMBER_PASSWORD=TestPass123!
-```
-
-**Run:**
-
-```bash
-npm run test:e2e           # Headless
-npm run test:e2e:headed    # With visible browser
-```
-
-Set `PLAYWRIGHT_BASE_URL` to your Vercel URL to test against production.
-
-**Test suite:**
-
-| Test | What it covers |
+| Layer | Technology |
 |---|---|
-| 01 - Auth restore | Session persists across reload; protected routes survive reload |
-| 02 - Catalog to detail | Browse catalog, click book, verify detail; detail survives reload |
-| 03 - AI Insights | Generate insights, verify structured display, verify cache on reload |
-| 04 - Member reservation | Reserve a book, verify on reservations page, cancel |
-| 05 - Staff circulation | Find available book, issue borrow to member, verify loan recorded |
+| Frontend | React 18 + TypeScript + Vite |
+| UI | shadcn/ui (Radix) + Tailwind CSS |
+| Data | TanStack Query v5 + Supabase (PostgreSQL) |
+| Auth | Supabase Auth (email/password + magic link) |
+| AI | OpenAI GPT-4o-mini (Vercel serverless function) |
+| Testing | Vitest (unit) + Playwright (E2E) |
+| Hosting | Vercel |
 
-## Deployment
+## Core Features (Required)
 
-1. Import the repo on [Vercel](https://vercel.com/new)
-2. Framework preset: **Vite** (auto-detected)
-3. Add all 4 environment variables
-4. Deploy
+### Book Management
+- Add, edit, and archive books with rich metadata: title, author, ISBN, genre, year, description, cover image, and rating
+- Manage multiple physical copies per book (add/remove individual copies with condition tracking)
+- Archive instead of hard delete to preserve loan history
 
-The `vercel.json` SPA rewrite handles client-side routing. The `api/` directory contains the serverless function for AI insights.
+### Check-in / Check-out (Borrow & Return)
+- Staff can issue borrows: search for a member, select an available copy, set loan period
+- Staff can process returns with overdue detection
+- Members see active loans with due dates and can request renewals
+- Loan history tracked per book with borrower info and timestamps
 
-## Quick Evaluation Guide
+### Search
+- Full-text search on the catalog page by title, author, or ISBN
+- Genre filter buttons for quick category browsing
+- Search and genre filter work together
 
-1. Open the app and browse `/catalog` — filter by genre, click a book
-2. On a book detail page, scroll to **AI Insights** and click **Generate Insights** (requires sign-in)
-3. Sign in as staff (`alice@example.com`) — note the Admin section in the sidebar
-4. On any book detail page, click **Issue Borrow** — search for a member, select a copy, confirm
-5. Navigate to **Loans** in the sidebar to see the loan record
-6. Sign in as member (`bob@example.com`) — check **My Books** for active loans and **Reservations** for holds
-7. Reload any page — session and data persist
+## Bonus Features
 
-## Architecture
+### Deployment
+Deployed on Vercel with live URL (see above).
 
-The app follows a layered architecture:
+### Authentication & Roles
+- Supabase Auth with email/password and magic link sign-in
+- Three roles: **admin**, **librarian**, **member**
+- Role-based route protection: admin/staff pages redirect unauthenticated users
+- Role-based UI gating: admin sidebar section only visible to staff
+- Session persists across page reloads
 
-```
-Pages → Hooks (TanStack Query) → Query Functions → Supabase Client
-                                                  → Mock Data (fallback)
-```
+### AI Feature: Book Insights
+On-demand, AI-generated insights for any book in the catalog. Helps borrowers make informed decisions from catalog metadata alone — solving the "should I read this?" problem without requiring reviews or ratings from other users.
 
-- Pages never import Supabase directly — all data access goes through hooks
-- Hooks fall back to mock data when Supabase is not configured (graceful degradation)
-- RLS policies enforce access control at the database level
-- Auth state is managed via `AuthContext` with `getSession()` + `onAuthStateChange` (no async work in the listener)
+**How it works:**
+1. User clicks "Generate Insights" on any book detail page
+2. A Vercel serverless function sends the book's metadata to GPT-4o-mini
+3. The AI returns structured insights: summary, best-for audience, tone, themes, and a "why read it" recommendation
+4. Results are cached in the database with a prompt hash — subsequent visits load instantly
+5. If the book's metadata changes, the prompt hash changes and insights regenerate on next request
 
-See `docs/architecture.md` for the full design document.
+## Extra Features
+
+- **Reservation system** — members can reserve books and join a queue with position tracking and estimated availability
+- **Copy-level inventory** — each book can have multiple physical copies, each tracked individually (available/borrowed, condition)
+- **Rich book detail pages** — loan history, copy availability, related books by genre, more by author, staff picks
+- **Member loan dashboard** — active loans with due dates, overdue badges, renewal requests
+- **Admin dashboard** — stats (total books, active loans, overdue, members), recent loan activity
+- **Catalog management** — staff can add/edit/archive books and manage copies from a dedicated admin page
+- **Dark premium UI** — custom design system with copper/amber accent palette, Playfair Display + DM Sans typography
+- **E2E smoke tests** — 7 Playwright tests covering auth, catalog, AI insights, reservations, and circulation
 
 ## Known Limitations
 
 - Reservation queue does not auto-transition from `waiting` to `ready` when a copy is returned
-- Audit trail schema (`audit_logs` table) exists but is not populated by the app
+- Audit trail schema exists but is not populated
 - Settings page is a placeholder
-- Wishlist/save button is client-side only (not persisted)
-- No regenerate button for AI insights — insights refresh automatically if book metadata changes
-- Members page is read-only (no suspend/edit functionality)
+- Wishlist/save is client-side only (not persisted)
+- Members page is read-only (no suspend/edit)

@@ -1,14 +1,23 @@
 import { useBooks, useGenres } from "@/hooks/useBooks";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Filter, AlertCircle } from "lucide-react";
-import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Star, Filter, AlertCircle, Search, X } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BookCoverImage from "@/components/BookCoverImage";
 
 const CatalogPage = () => {
   const navigate = useNavigate();
   const [activeGenre, setActiveGenre] = useState("All");
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce search input by 300ms
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchInput), 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const { data: genreList = [] } = useGenres();
   const allGenres = ["All", ...genreList];
@@ -19,6 +28,7 @@ const CatalogPage = () => {
     isError,
     refetch,
   } = useBooks({
+    search: debouncedSearch || undefined,
     genre: activeGenre === "All" ? undefined : activeGenre,
   });
 
@@ -27,6 +37,25 @@ const CatalogPage = () => {
       <div>
         <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">Catalog</h1>
         <p className="text-muted-foreground font-body mt-1">Browse our complete collection</p>
+      </div>
+
+      {/* Search */}
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder="Search by title, author, or ISBN..."
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          className="pl-10 pr-9"
+        />
+        {searchInput && (
+          <button
+            onClick={() => setSearchInput("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Genre Filter */}
@@ -77,11 +106,11 @@ const CatalogPage = () => {
       {!isLoading && !isError && filtered.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <p className="text-sm font-body text-muted-foreground">
-            No books found{activeGenre !== "All" ? ` in "${activeGenre}"` : ""}.
+            No books found{debouncedSearch ? ` for "${debouncedSearch}"` : ""}{activeGenre !== "All" ? ` in "${activeGenre}"` : ""}.
           </p>
-          {activeGenre !== "All" && (
-            <Button variant="outline" size="sm" onClick={() => setActiveGenre("All")}>
-              Show all
+          {(activeGenre !== "All" || searchInput) && (
+            <Button variant="outline" size="sm" onClick={() => { setActiveGenre("All"); setSearchInput(""); }}>
+              Clear filters
             </Button>
           )}
         </div>

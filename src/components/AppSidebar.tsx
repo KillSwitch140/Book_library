@@ -12,7 +12,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { RoleGuard } from "@/components/RoleGuard";
 import {
@@ -67,14 +67,14 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-border bg-sidebar">
       <SidebarHeader className="p-4">
-        <div className="flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gradient-warm flex items-center justify-center shadow-glow">
             <BookMarked className="w-4 h-4 text-primary-foreground" />
           </div>
           {!collapsed && (
             <span className="font-display text-lg font-bold text-foreground">Athenaeum</span>
           )}
-        </div>
+        </Link>
       </SidebarHeader>
 
       <SidebarContent>
