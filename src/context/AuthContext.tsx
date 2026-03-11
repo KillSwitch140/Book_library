@@ -42,34 +42,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = useCallback(async (userId: string) => {
     if (!supabase) return;
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
-    setProfile(data);
+    try {
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+      setProfile(data);
+    } catch (err) {
+      console.error("Failed to fetch profile:", err);
+      setProfile(null);
+    }
   }, []);
 
+  // 1. Restore session on mount (synchronous from storage)
   useEffect(() => {
     if (!supabase) {
       setIsLoading(false);
       return;
     }
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      setSession(newSession);
-      if (newSession?.user) {
-        await fetchProfile(newSession.user.id);
-      } else {
-        setProfile(null);
-      }
+    supabase.auth.getSession().then(({ data: { session: initial } }) => {
+      setSession(initial);
       setIsLoading(false);
     });
 
+    // 2. Listen for auth changes (sign-in, sign-out, token refresh)
+    //    Keep this callback lightweight — no async work here.
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+    });
+
     return () => subscription.unsubscribe();
-  }, [fetchProfile]);
+  }, []);
+
+  // 3. Fetch profile whenever the user changes (decoupled from auth callback)
+  const userId = session?.user?.id;
+  useEffect(() => {
+    if (!userId) {
+      setProfile(null);
+      return;
+    }
+    fetchProfile(userId);
+  }, [userId, fetchProfile]);
 
   const signInWithPassword = useCallback(
     async (email: string, password: string) => {
