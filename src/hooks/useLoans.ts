@@ -15,7 +15,11 @@ import type { LoanView } from "@/types";
 // ---------------------------------------------------------------------------
 
 function filterMockLoans(opts: FetchLoansOpts): LoanView[] {
-  let result = [...mockLoans];
+  let result: LoanView[] = mockLoans.map((l) => ({
+    ...l,
+    bookId: "",
+    copyId: "",
+  }));
   if (opts.status) result = result.filter((l) => l.status === opts.status);
   if (opts.limit) result = result.slice(0, opts.limit);
   return result;

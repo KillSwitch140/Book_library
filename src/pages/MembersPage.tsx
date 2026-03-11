@@ -9,12 +9,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Search, Filter, ChevronDown, AlertCircle } from "lucide-react";
+import { Search, Filter, ChevronDown, AlertCircle, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 type StatusFilter = "all" | "active" | "suspended";
 
 const MembersPage = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
@@ -139,7 +141,11 @@ const MembersPage = () => {
               </thead>
               <tbody>
                 {members.map((member) => (
-                  <tr key={member.id} className="border-b border-border last:border-0 hover:bg-surface-elevated/50 transition-colors">
+                  <tr
+                    key={member.id}
+                    onClick={() => navigate(`/members/${member.id}`)}
+                    className="border-b border-border last:border-0 hover:bg-surface-elevated/50 transition-colors cursor-pointer"
+                  >
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
@@ -161,9 +167,7 @@ const MembersPage = () => {
                       </Badge>
                     </td>
                     <td className="px-5 py-3">
-                      <Button variant="ghost" size="icon" className="text-muted-foreground">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
                     </td>
                   </tr>
                 ))}

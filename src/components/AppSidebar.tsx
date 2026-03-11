@@ -47,6 +47,9 @@ const adminItems: NavItem[] = [
   { title: "Manage Catalog", url: "/admin/catalog", icon: BookCopy },
   { title: "Members", url: "/members", icon: Users },
   { title: "Loans", url: "/loans", icon: ArrowLeftRight },
+];
+
+const adminOnlyItems: NavItem[] = [
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
@@ -124,6 +127,22 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
+                <RoleGuard allow="admin">
+                  {adminOnlyItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                        <NavLink
+                          to={item.url}
+                          className="text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+                          activeClassName="bg-sidebar-accent text-foreground font-medium"
+                        >
+                          <item.icon className="w-4 h-4 mr-2.5" />
+                          {!collapsed && <span className="font-body text-sm">{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </RoleGuard>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

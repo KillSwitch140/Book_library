@@ -58,10 +58,57 @@ export async function fetchMembers(opts: FetchMembersOpts = {}): Promise<MemberV
     id: p.id,
     name: p.full_name,
     email: p.email,
+    role: p.role as "member" | "librarian" | "admin",
     memberSince: p.created_at.slice(0, 10),
     activeLoans: countMap.get(p.id) ?? 0,
     status: p.is_suspended ? ("suspended" as const) : ("active" as const),
   }));
+}
+
+export async function fetchMember(id: string): Promise<MemberView | null> {
+  if (!supabase) throw new Error("Supabase not configured");
+
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) throw error;
+  if (!profile) return null;
+
+  // Fetch active loan count for this member
+  const { data: loans, error: loanErr } = await supabase
+    .from("loans")
+    .select("id")
+    .eq("member_id", id)
+    .in("status", ["active", "overdue"]);
+
+  if (loanErr) throw loanErr;
+
+  return {
+    id: profile.id,
+    name: profile.full_name,
+    email: profile.email,
+    role: profile.role as "member" | "librarian" | "admin",
+    memberSince: profile.created_at.slice(0, 10),
+    activeLoans: loans?.length ?? 0,
+    status: profile.is_suspended ? "suspended" : "active",
+  };
+}
+
+export async function toggleMemberSuspension(
+  id: string,
+  suspend: boolean,
+): Promise<void> {
+  if (!supabase) throw new Error("Supabase not configured");
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ is_suspended: suspend })
+    .eq("id", id);
+
+  if (error) throw error;
 }
 
 export async function fetchMemberCount(): Promise<number> {

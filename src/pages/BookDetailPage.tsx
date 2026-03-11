@@ -543,7 +543,9 @@ const BookDetailPage = () => {
             <div className="rounded-xl border border-border bg-card p-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <AdminAction icon={Pencil} label="Edit Book" onClick={() => setEditOpen(true)} />
-                <AdminAction icon={Archive} label="Archive Book" onClick={() => setArchiveOpen(true)} />
+                <RoleGuard allow="admin">
+                  <AdminAction icon={Archive} label="Archive Book" onClick={() => setArchiveOpen(true)} />
+                </RoleGuard>
                 <AdminAction icon={Settings2} label="Manage Copies" onClick={() => setCopyMgmtOpen(true)} />
                 <AdminAction icon={History} label="Loan History" onClick={() => {
                   // Scroll to the activity section

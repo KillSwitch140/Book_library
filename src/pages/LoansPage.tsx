@@ -2,6 +2,7 @@ import { useLoans } from "@/hooks/useLoans";
 import { Button } from "@/components/ui/button";
 import { Clock, AlertCircle, Filter, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -102,6 +103,7 @@ const LoansPage = () => {
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Book</th>
+                  <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Copy</th>
                   <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Member</th>
                   <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Borrowed</th>
                   <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Due</th>
@@ -112,7 +114,27 @@ const LoansPage = () => {
               <tbody>
                 {loans.map((loan) => (
                   <tr key={loan.id} className="border-b border-border last:border-0 hover:bg-surface-elevated/50 transition-colors">
-                    <td className="px-5 py-3 text-sm font-body font-medium text-foreground">{loan.bookTitle}</td>
+                    <td className="px-5 py-3 text-sm font-body font-medium text-foreground">
+                      {loan.bookId ? (
+                        <Link
+                          to={`/book/${loan.bookId}`}
+                          className="hover:underline hover:text-copper transition-colors"
+                        >
+                          {loan.bookTitle}
+                        </Link>
+                      ) : (
+                        loan.bookTitle
+                      )}
+                    </td>
+                    <td className="px-5 py-3">
+                      {loan.copyId ? (
+                        <span className="inline-block px-1.5 py-0.5 rounded text-[11px] font-mono text-muted-foreground bg-secondary">
+                          #{loan.copyId.slice(-4)}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">—</span>
+                      )}
+                    </td>
                     <td className="px-5 py-3 text-sm font-body text-muted-foreground">{loan.memberName}</td>
                     <td className="px-5 py-3 text-sm font-body text-muted-foreground">{loan.borrowDate}</td>
                     <td className="px-5 py-3 text-sm font-body text-muted-foreground">{loan.dueDate}</td>

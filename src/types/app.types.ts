@@ -63,6 +63,7 @@ export interface MemberView {
   id: string;
   name: string;
   email: string;
+  role: "member" | "librarian" | "admin";
   memberSince: string;
   activeLoans: number;
   status: "active" | "suspended" | "expired";
@@ -71,6 +72,8 @@ export interface MemberView {
 /** Matches the `Loan` interface from `src/data/mockData.ts`. */
 export interface LoanView {
   id: string;
+  bookId: string;
+  copyId: string;
   bookTitle: string;
   memberName: string;
   borrowDate: string;

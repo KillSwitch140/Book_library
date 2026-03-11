@@ -15,6 +15,7 @@ import ReservationsPage from "@/pages/ReservationsPage";
 import AdminPage from "@/pages/AdminPage";
 import CatalogManagementPage from "@/pages/CatalogManagementPage";
 import MembersPage from "@/pages/MembersPage";
+import MemberDetailPage from "@/pages/MemberDetailPage";
 import LoansPage from "@/pages/LoansPage";
 import SettingsPage from "@/pages/SettingsPage";
 import BookDetailPage from "@/pages/BookDetailPage";
@@ -48,8 +49,9 @@ const App = () => (
               <Route path="/admin" element={<ProtectedRoute requiredRole={["librarian", "admin"]}><AdminPage /></ProtectedRoute>} />
               <Route path="/admin/catalog" element={<ProtectedRoute requiredRole={["librarian", "admin"]}><CatalogManagementPage /></ProtectedRoute>} />
               <Route path="/members" element={<ProtectedRoute requiredRole={["librarian", "admin"]}><MembersPage /></ProtectedRoute>} />
+              <Route path="/members/:id" element={<ProtectedRoute requiredRole={["librarian", "admin"]}><MemberDetailPage /></ProtectedRoute>} />
               <Route path="/loans" element={<ProtectedRoute requiredRole={["librarian", "admin"]}><LoansPage /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute requiredRole={["librarian", "admin"]}><SettingsPage /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute requiredRole="admin"><SettingsPage /></ProtectedRoute>} />
 
               <Route path="*" element={<NotFound />} />
             </Route>

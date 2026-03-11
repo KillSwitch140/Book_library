@@ -47,6 +47,8 @@ function toLoanView(row: LoanJoinRow, now: Date): LoanView {
 
   return {
     id: row.id,
+    bookId: row.book_copies?.book_id ?? "",
+    copyId: row.copy_id,
     bookTitle: row.book_copies?.books?.title ?? "Unknown",
     memberName: row.profiles?.full_name ?? "Unknown",
     borrowDate: row.borrowed_at.slice(0, 10),
