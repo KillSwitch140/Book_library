@@ -121,24 +121,26 @@
 - [x] Client hooks: `useBookInsights` (query) + `useGenerateInsights` (mutation)
 - [x] TypeScript types for DB row + UI view
 
-## Phase 7B — AI Insights UI (BookDetailPage)
+## Phase 7B — AI Insights UI (BookDetailPage) ✅
 
-- [ ] "Generate Insights" button on BookDetailPage
-- [ ] Display cached insights (summary, best_for chips, tone chips, themes, why_read_it)
-- [ ] Loading/error states
-- [ ] Regenerate button (staff only?)
+- [x] "Generate Insights" button on BookDetailPage (gated on auth)
+- [x] Display cached insights (summary, best_for chips, tone chips, themes, why_read_it)
+- [x] Loading/error states (skeleton while loading, metadata warning, sign-in prompt)
+- [ ] Regenerate button (deferred — insights auto-refresh when book metadata changes via prompt hash)
 
-## Phase 8 — AI Features (Recommendations)
+## Phase 10 — README, Smoke Tests & Submission Packaging ✅
 
-- [ ] Vercel serverless function: `/api/recommend`
-- [ ] Recommendations section on `BookDetailPage` or `HomePage`
-- [ ] Based on genre, reading history, or book similarity
+- [x] Playwright smoke test suite (5 tests: auth, catalog, AI insights, reservations, circulation)
+- [x] Fix BorrowDialog member search bug (useEffect deps causing input reset)
+- [x] Deterministic staff circulation test (finds available book dynamically)
+- [x] Submission-ready README with setup, evaluation guide, and known limitations
+- [x] Clean up root directory (remove Lovable/bun artifacts, improve gitignore)
 
-## Phase 9 — Polish & Production
+## Not Implemented (Out of Scope)
 
-- [ ] Error boundaries
-- [ ] Loading skeletons for all data-fetching pages
-- [ ] Toast notifications for mutations (borrow, return, reserve)
-- [ ] Responsive design audit
-- [ ] Lighthouse performance audit
-- [ ] Final cleanup and documentation
+- AI-powered book recommendations (`/api/recommend`)
+- Error boundaries
+- Responsive design audit
+- Lighthouse performance audit
+- Member suspend/edit functionality
+- Reservation auto-fulfillment (waiting → ready on return)

@@ -1,22 +1,16 @@
 import { test, expect } from "@playwright/test";
-import { signIn, goToCatalog, clickFirstBook, STAFF, MEMBER } from "./helpers";
+import { signIn, findAvailableBook, STAFF, MEMBER } from "./helpers";
 
 test.describe("Staff circulation flow", () => {
-  test("issue borrow then process return", async ({ page }) => {
+  test("issue borrow for an available book", async ({ page }) => {
     await signIn(page, STAFF);
-    await goToCatalog(page);
-    await clickFirstBook(page);
 
-    // The book must be available to borrow
-    const borrowBtn = page.getByRole("button", { name: "Issue Borrow" });
-    const isAvailable = await borrowBtn
-      .isEnabled({ timeout: 5_000 })
-      .catch(() => false);
-
-    // Skip if no available copies
-    test.skip(!isAvailable, "No available copies to test borrow flow");
+    // Find a book with available copies (tries up to 10 books)
+    const found = await findAvailableBook(page);
+    test.skip(!found, "No books with available copies in catalog");
 
     // Open borrow dialog
+    const borrowBtn = page.getByRole("button", { name: "Issue Borrow" });
     await borrowBtn.click();
     await expect(page.getByText("Borrow Book")).toBeVisible({
       timeout: 5_000,
