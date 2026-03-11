@@ -181,6 +181,9 @@ export default function LoginPage() {
 
                 {/* Magic Link tab */}
                 <TabsContent value="magic-link" className="space-y-4 pt-4">
+                  <p className="text-xs font-body text-muted-foreground">
+                    Sign in without a password. Only available for existing accounts.
+                  </p>
                   {magicLinkError && (
                     <Alert variant="destructive">
                       <AlertDescription>{magicLinkError}</AlertDescription>
