@@ -500,37 +500,51 @@ const BookDetailPage = () => {
               </div>
             </div>
 
-            {/* Recent Activity */}
-            <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-              <div className="flex items-center gap-2 text-foreground font-body font-medium">
-                <History className="w-4 h-4 text-primary" /> Recent Activity
-              </div>
-              {loanHistory.length > 0 ? (
-                <div className="space-y-3">
-                  {loanHistory.map((entry) => (
-                    <div key={entry.id} className="flex items-center justify-between text-sm font-body">
-                      <div className="flex items-center gap-3">
-                        <span className="text-muted-foreground w-24">{entry.borrowDate}</span>
-                        <span className={`${
-                          entry.status === "returned"
-                            ? "text-emerald-400"
-                            : entry.status === "overdue"
-                              ? "text-red-400"
-                              : "text-foreground"
-                        }`}>
-                          {entry.status === "returned" ? "Returned" : entry.status === "overdue" ? "Overdue" : "Borrowed"}
-                        </span>
-                      </div>
-                      <span className="text-muted-foreground">{entry.memberName}</span>
-                    </div>
-                  ))}
+            {/* Recent Activity — staff only (shows borrower names) */}
+            <RoleGuard
+              allow={["librarian", "admin"]}
+              fallback={
+                <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+                  <div className="flex items-center gap-2 text-foreground font-body font-medium">
+                    <History className="w-4 h-4 text-primary" /> Recent Activity
+                  </div>
+                  <p className="text-sm text-muted-foreground font-body">
+                    Circulation history is only visible to library staff.
+                  </p>
                 </div>
-              ) : (
-                <p className="text-sm text-muted-foreground font-body">
-                  No loan history yet.
-                </p>
-              )}
-            </div>
+              }
+            >
+              <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+                <div className="flex items-center gap-2 text-foreground font-body font-medium">
+                  <History className="w-4 h-4 text-primary" /> Recent Activity
+                </div>
+                {loanHistory.length > 0 ? (
+                  <div className="space-y-3">
+                    {loanHistory.map((entry) => (
+                      <div key={entry.id} className="flex items-center justify-between text-sm font-body">
+                        <div className="flex items-center gap-3">
+                          <span className="text-muted-foreground w-24">{entry.borrowDate}</span>
+                          <span className={`${
+                            entry.status === "returned"
+                              ? "text-emerald-400"
+                              : entry.status === "overdue"
+                                ? "text-red-400"
+                                : "text-foreground"
+                          }`}>
+                            {entry.status === "returned" ? "Returned" : entry.status === "overdue" ? "Overdue" : "Borrowed"}
+                          </span>
+                        </div>
+                        <span className="text-muted-foreground">{entry.memberName}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground font-body">
+                    No loan history yet.
+                  </p>
+                )}
+              </div>
+            </RoleGuard>
           </div>
         </section>
 

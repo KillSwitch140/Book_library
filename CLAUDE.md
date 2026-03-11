@@ -32,8 +32,8 @@ Tests use Vitest with jsdom. Test files go in `src/**/*.{test,spec}.{ts,tsx}` wi
 ### Key patterns
 
 - **Path alias**: `@/` maps to `src/` throughout the codebase
-- **All data is mock**: `src/data/mockData.ts` exports typed arrays (`books`, `members`, `loans`, `reservations`, `genres`) — there is no backend or API
-- **No state management library**: pages read directly from mock data; TanStack Query is available but not actively used for data fetching
+- **Supabase backend** with graceful degradation: when env vars are missing, hooks fall back to mock data from `src/data/mockData.ts`
+- **TanStack Query**: all data fetching uses query/mutation hooks in `src/hooks/` backed by Supabase queries in `src/lib/`
 - **shadcn/ui components**: UI primitives live in `src/components/ui/` — add new ones via `npx shadcn@latest add <component>`
 
 ### Routing (`src/App.tsx`)
@@ -50,13 +50,13 @@ React Router v6. All routes are wrapped in `AppLayout`, which provides the colla
 | `/admin` | AdminPage |
 | `/admin/catalog` | CatalogManagementPage |
 | `/members` | MembersPage |
+| `/members/:id` | MemberDetailPage |
 | `/loans` | LoansPage |
-| `/settings` | SettingsPage |
 
 ### Sidebar sections
 
 - **Browse**: Home, Catalog, My Books, Reservations (member-facing)
-- **Admin**: Dashboard, Manage Catalog, Members, Loans, Settings (admin-facing)
+- **Admin**: Dashboard, Manage Catalog, Members, Loans (admin-facing)
 
 ### Styling
 

@@ -10,8 +10,10 @@ import {
   AlertCircle,
   ShieldAlert,
   ShieldCheck,
+  CheckCircle2,
   Loader2,
 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import {
   Dialog,
@@ -32,6 +34,7 @@ const MemberDetailPage = () => {
   const [suspendOpen, setSuspendOpen] = useState(false);
 
   const activeLoans = loans.filter((l) => l.status === "active" || l.status === "overdue");
+  const returnedLoans = loans.filter((l) => l.status === "returned");
   const overdueCount = loans.filter((l) => l.status === "overdue").length;
 
   if (isLoading) {
@@ -142,10 +145,10 @@ const MemberDetailPage = () => {
         </InfoCard>
       </div>
 
-      {/* Active Loans */}
+      {/* Borrowing Activity */}
       <section className="space-y-4">
         <h2 className="text-xl font-display font-semibold text-foreground px-1">
-          Active Loans
+          Borrowing Activity
         </h2>
 
         {loansLoading ? (
@@ -154,63 +157,33 @@ const MemberDetailPage = () => {
               <div key={i} className="h-4 bg-secondary rounded animate-pulse" />
             ))}
           </div>
-        ) : activeLoans.length === 0 ? (
-          <div className="bg-card border border-border rounded-xl p-8 text-center">
-            <p className="text-sm font-body text-muted-foreground">No active loans.</p>
-          </div>
         ) : (
-          <div className="bg-card border border-border rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Book</th>
-                    <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Copy</th>
-                    <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Borrowed</th>
-                    <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Due</th>
-                    <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {activeLoans.map((loan) => (
-                    <tr key={loan.id} className="border-b border-border last:border-0 hover:bg-surface-elevated/50 transition-colors">
-                      <td className="px-5 py-3 text-sm font-body font-medium text-foreground">
-                        {loan.bookId ? (
-                          <Link
-                            to={`/book/${loan.bookId}`}
-                            className="hover:underline hover:text-copper transition-colors"
-                          >
-                            {loan.bookTitle}
-                          </Link>
-                        ) : (
-                          loan.bookTitle
-                        )}
-                      </td>
-                      <td className="px-5 py-3">
-                        {loan.copyId ? (
-                          <span className="inline-block px-1.5 py-0.5 rounded text-[11px] font-mono text-muted-foreground bg-secondary">
-                            #{loan.copyId.slice(-4)}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">—</span>
-                        )}
-                      </td>
-                      <td className="px-5 py-3 text-sm font-body text-muted-foreground">{loan.borrowDate}</td>
-                      <td className="px-5 py-3 text-sm font-body text-muted-foreground">{loan.dueDate}</td>
-                      <td className="px-5 py-3">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-body font-medium ${
-                          loan.status === "overdue" ? "bg-red-500/15 text-red-400" : "bg-emerald-500/15 text-emerald-400"
-                        }`}>
-                          <Clock className="w-3 h-3" />
-                          {loan.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <Tabs defaultValue="active">
+            <TabsList className="mb-4">
+              <TabsTrigger value="active">Active ({activeLoans.length})</TabsTrigger>
+              <TabsTrigger value="history">History ({returnedLoans.length})</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="active">
+              {activeLoans.length === 0 ? (
+                <div className="bg-card border border-border rounded-xl p-8 text-center">
+                  <p className="text-sm font-body text-muted-foreground">No active loans.</p>
+                </div>
+              ) : (
+                <LoanTable loans={activeLoans} variant="active" />
+              )}
+            </TabsContent>
+
+            <TabsContent value="history">
+              {returnedLoans.length === 0 ? (
+                <div className="bg-card border border-border rounded-xl p-8 text-center">
+                  <p className="text-sm font-body text-muted-foreground">No returned loans yet.</p>
+                </div>
+              ) : (
+                <LoanTable loans={returnedLoans} variant="returned" />
+              )}
+            </TabsContent>
+          </Tabs>
         )}
       </section>
 
@@ -267,6 +240,72 @@ const MemberDetailPage = () => {
     </div>
   );
 };
+
+const LoanTable = ({ loans, variant }: { loans: { id: string; bookId: string; copyId: string; bookTitle: string; borrowDate: string; dueDate: string; returnDate: string | null; status: string }[]; variant: "active" | "returned" }) => (
+  <div className="bg-card border border-border rounded-xl overflow-hidden">
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead>
+          <tr className="border-b border-border">
+            <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Book</th>
+            <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Copy</th>
+            <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Borrowed</th>
+            <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">
+              {variant === "returned" ? "Returned" : "Due"}
+            </th>
+            <th className="text-left text-xs font-body font-medium text-muted-foreground px-5 py-3">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {loans.map((loan) => (
+            <tr key={loan.id} className="border-b border-border last:border-0 hover:bg-surface-elevated/50 transition-colors">
+              <td className="px-5 py-3 text-sm font-body font-medium text-foreground">
+                {loan.bookId ? (
+                  <Link
+                    to={`/book/${loan.bookId}`}
+                    className="hover:underline hover:text-copper transition-colors"
+                  >
+                    {loan.bookTitle}
+                  </Link>
+                ) : (
+                  loan.bookTitle
+                )}
+              </td>
+              <td className="px-5 py-3">
+                {loan.copyId ? (
+                  <span className="inline-block px-1.5 py-0.5 rounded text-[11px] font-mono text-muted-foreground bg-secondary">
+                    #{loan.copyId.slice(-4)}
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground text-sm">—</span>
+                )}
+              </td>
+              <td className="px-5 py-3 text-sm font-body text-muted-foreground">{loan.borrowDate}</td>
+              <td className="px-5 py-3 text-sm font-body text-muted-foreground">
+                {variant === "returned" ? (loan.returnDate || "—") : loan.dueDate}
+              </td>
+              <td className="px-5 py-3">
+                {variant === "returned" ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-body font-medium bg-muted text-muted-foreground">
+                    <CheckCircle2 className="w-3 h-3" />
+                    returned
+                  </span>
+                ) : (
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-body font-medium ${
+                    loan.status === "overdue" ? "bg-red-500/15 text-red-400" : "bg-emerald-500/15 text-emerald-400"
+                  }`}>
+                    <Clock className="w-3 h-3" />
+                    {loan.status}
+                  </span>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
 
 const InfoCard = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="rounded-xl border border-border bg-card p-4 space-y-1.5">

@@ -17,7 +17,6 @@ import CatalogManagementPage from "@/pages/CatalogManagementPage";
 import MembersPage from "@/pages/MembersPage";
 import MemberDetailPage from "@/pages/MemberDetailPage";
 import LoansPage from "@/pages/LoansPage";
-import SettingsPage from "@/pages/SettingsPage";
 import BookDetailPage from "@/pages/BookDetailPage";
 import NotFound from "@/pages/NotFound";
 import { queryClient } from "@/lib/queryClient";
@@ -51,7 +50,6 @@ const App = () => (
               <Route path="/members" element={<ProtectedRoute requiredRole={["librarian", "admin"]}><MembersPage /></ProtectedRoute>} />
               <Route path="/members/:id" element={<ProtectedRoute requiredRole={["librarian", "admin"]}><MemberDetailPage /></ProtectedRoute>} />
               <Route path="/loans" element={<ProtectedRoute requiredRole={["librarian", "admin"]}><LoansPage /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute requiredRole="admin"><SettingsPage /></ProtectedRoute>} />
 
               <Route path="*" element={<NotFound />} />
             </Route>

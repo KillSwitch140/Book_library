@@ -8,8 +8,6 @@ export type DbBook = Database["public"]["Tables"]["books"]["Row"];
 export type DbBookCopy = Database["public"]["Tables"]["book_copies"]["Row"];
 export type DbProfile = Database["public"]["Tables"]["profiles"]["Row"];
 export type DbLoan = Database["public"]["Tables"]["loans"]["Row"];
-export type DbReservation = Database["public"]["Tables"]["reservations"]["Row"];
-export type DbAuditLog = Database["public"]["Tables"]["audit_logs"]["Row"];
 export type DbBookAiInsights = Database["public"]["Tables"]["book_ai_insights"]["Row"];
 
 // ---------------------------------------------------------------------------
@@ -17,8 +15,6 @@ export type DbBookAiInsights = Database["public"]["Tables"]["book_ai_insights"][
 // ---------------------------------------------------------------------------
 
 export type UserRole = DbProfile["role"];
-export type LoanStatus = DbLoan["status"];
-export type ReservationStatus = DbReservation["status"];
 export type CopyCondition = DbBookCopy["condition"];
 
 // ---------------------------------------------------------------------------
