@@ -58,5 +58,4 @@ Do NOT use ambiguous reversed check-in/check-out wording in the UI.
 - member
 
 ## Current state
-UI scaffold was generated in Lovable.
-Need to now convert this into an intentional, production-ready app without unnecessary rewrites.
+Production-ready app with Supabase backend, auth, role-based access, and AI features.

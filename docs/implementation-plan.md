@@ -2,9 +2,9 @@
 
 ## Phase 0 — Cleanup & Standards ✅
 
-- [x] Replace Lovable branding with Athenaeum
-- [x] Remove lovable-tagger plugin
-- [x] Replace Lovable Playwright wrappers with plain @playwright/test
+- [x] Replace initial branding with Athenaeum
+- [x] Remove legacy build plugins
+- [x] Replace legacy Playwright wrappers with plain @playwright/test
 - [x] Delete unused `Index.tsx`
 - [x] Enable TypeScript strict mode (0 errors)
 - [x] Fix ESLint config (`no-unused-vars` → error with `^_` pattern)

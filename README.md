@@ -1,17 +1,23 @@
 # Athenaeum
 
-A premium digital library management system with book catalog, staff-mediated circulation, member reservations, and AI-powered book insights.
+Athenaeum is a digital library system for managing a catalog, circulation, and reservations. It supports both **staff workflows** (catalog management and lending) and **member workflows** (browsing, reserving, and tracking borrowed books).
 
-## Live Demo
 
-**URL:** https://book-library-ganesh.vercel.app
 
-| Role | Email | Password |
-|---|---|---|
-| Staff (librarian) | alice@example.com | TestPass123! |
-| Member | bob@example.com | TestPass123! |
 
-## How to Run Locally
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 18 + TypeScript + Vite |
+| UI | shadcn/ui (Radix) + Tailwind CSS |
+| Data | TanStack Query v5 + Supabase (PostgreSQL) |
+| Auth | Supabase Auth (email/password + magic link) |
+| AI | OpenAI GPT-4o-mini (Vercel serverless function) |
+| Hosting | Vercel |
+| Dataset | https://www.kaggle.com/datasets/pooriamst/best-books-ever-dataset |
+
+## Running Locally
 
 ```bash
 git clone https://github.com/KillSwitch140/Book_library.git
@@ -36,73 +42,107 @@ Run the two migration files in **Supabase SQL Editor**:
 npm run dev    # Starts on http://localhost:8080
 ```
 
-## Tech Stack
+## Core Features
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 18 + TypeScript + Vite |
-| UI | shadcn/ui (Radix) + Tailwind CSS |
-| Data | TanStack Query v5 + Supabase (PostgreSQL) |
-| Auth | Supabase Auth (email/password + magic link) |
-| AI | OpenAI GPT-4o-mini (Vercel serverless function) |
-| Testing | Vitest (unit) + Playwright (E2E) |
-| Hosting | Vercel |
+### Catalog Management
 
-## Core Features (Required)
+Staff can manage the book catalog with structured metadata.
 
-### Book Management
-- Add, edit, and archive books with rich metadata: title, author, ISBN, genre, year, description, cover image, and rating
-- Manage multiple physical copies per book (add/remove individual copies with condition tracking)
-- Archive instead of hard delete to preserve loan history
+- Add, edit, and archive books with title, author, ISBN, genre, description, rating, and cover image.
+- Books can have **multiple physical copies**, each tracked individually with condition and availability.
+- Archive instead of hard delete to preserve loan history.
 
-### Check-in / Check-out (Borrow & Return)
-- Staff can issue borrows: search for a member, select an available copy, set loan period
-- Staff can process returns with overdue detection
-- Members see active loans with due dates and can request renewals
-- Loan history tracked per book with borrower info and timestamps
+### Borrow / Return (Circulation)
+
+Borrowing is **staff-mediated**, which mirrors how many real libraries operate.
+
+- Staff issue loans by selecting a member and an available copy.
+- The system tracks borrow date, due date, return date, and overdue status.
+- Members can view their current loans and renewal options from their dashboard.
 
 ### Search
-- Full-text search on the catalog page by title, author, or ISBN
-- Genre filter buttons for quick category browsing
-- Search and genre filter work together
 
-## Bonus Features
+The catalog supports browsing and discovery.
 
-### Deployment
-Deployed on Vercel with live URL (see above).
+- Full-text search by title, author, or ISBN.
+- Genre filters to quickly narrow down results.
+- Search and genre filter work together.
 
-### Authentication & Roles
-- Supabase Auth with email/password and magic link sign-in
-- Three roles: **admin**, **librarian**, **member**
-- Role-based route protection: admin/staff pages redirect unauthenticated users
-- Role-based UI gating: admin sidebar section only visible to staff
-- Session persists across page reloads
+## Roles and Permissions
 
-### AI Feature: Book Insights
-On-demand, AI-generated insights for any book in the catalog. Helps borrowers make informed decisions from catalog metadata alone — solving the "should I read this?" problem without requiring reviews or ratings from other users.
+The system has three roles with a clear privilege hierarchy.
+
+### Member
+
+- Browse the catalog and view book details.
+- Reserve books and track queue position.
+- View their own active loans, due dates, and request renewals.
+- Generate AI insights for any book.
+
+### Librarian
+
+- Everything a member can do, plus:
+- Issue borrows and process returns.
+- Add, edit, and manage book copies.
+- View all members, member detail pages, and full loan records.
+- See circulation history on book detail pages (borrower names, dates, status).
+
+### Admin
+
+- Everything a librarian can do, plus:
+- **Archive books** from the catalog (destructive action).
+- **Suspend or unsuspend members** (affects their ability to borrow).
+
+The distinction is intentional: day-to-day librarians handle circulation and catalog updates, while admins control higher-impact operations.
+
+## Additional Features
+
+### Reservation System
+
+Members can reserve books that are currently unavailable. The system tracks queue position so members know where they stand, rather than having to repeatedly check the catalog.
+
+
+### Admin Dashboard
+
+Staff can see high-level operational information at a glance.
+
+- Total books, active loans, overdue count, and member counts.
+- Recent loan activity for quick operational visibility.
+- **Popular books** ranked by loan frequency.
+- **Low availability alerts** for books running low on copies.
+
+### Member Detail Pages
+
+Staff can click into any member to see their full profile and borrowing activity.
+
+- Role, status, and membership info.
+- Active loans with book links, copy IDs, and overdue indicators.
+- Full borrowing history including returned books with return dates.
+- Admins can suspend or unsuspend members directly from this page.
+
+### Privacy
+
+Circulation history (who borrowed what) is only visible to staff. Regular members see book availability and copy status, but not other members' borrowing activity.
+
+## AI Feature — Book Insights
+
+Borrowers often see only a title and description when browsing a catalog. That usually isn't enough to decide whether to borrow a book.
+
+This feature generates **structured insights from catalog metadata** to help users decide more quickly.
+
+When requested, the system generates:
+
+- a short summary
+- who the book might appeal to
+- tone and themes
+- a short "why read it" explanation
 
 **How it works:**
-1. User clicks "Generate Insights" on any book detail page
-2. A Vercel serverless function sends the book's metadata to GPT-4o-mini
-3. The AI returns structured insights: summary, best-for audience, tone, themes, and a "why read it" recommendation
-4. Results are cached in the database with a prompt hash — subsequent visits load instantly
-5. If the book's metadata changes, the prompt hash changes and insights regenerate on next request
 
-## Extra Features
+1. User clicks "Generate Insights" on any book detail page.
+2. A Vercel serverless function sends the book's metadata to GPT-4o-mini.
+3. The AI returns structured insights cached in the database.
+4. Future views load instantly from the cached result.
+5. If the book's metadata changes, insights regenerate on next request.
 
-- **Reservation system** — members can reserve books and join a queue with position tracking and estimated availability
-- **Copy-level inventory** — each book can have multiple physical copies, each tracked individually (available/borrowed, condition)
-- **Rich book detail pages** — loan history, copy availability, related books by genre, more by author, staff picks
-- **Member loan dashboard** — active loans with due dates, overdue badges, renewal requests
-- **Admin dashboard** — stats (total books, active loans, overdue, members), recent loan activity
-- **Catalog management** — staff can add/edit/archive books and manage copies from a dedicated admin page
-- **Dark premium UI** — custom design system with copper/amber accent palette, Playfair Display + DM Sans typography
-- **E2E smoke tests** — 7 Playwright tests covering auth, catalog, AI insights, reservations, and circulation
 
-## Known Limitations
-
-- Reservation queue does not auto-transition from `waiting` to `ready` when a copy is returned
-- Audit trail schema exists but is not populated
-- Settings page is a placeholder
-- Wishlist/save is client-side only (not persisted)
-- Members page is read-only (no suspend/edit)
