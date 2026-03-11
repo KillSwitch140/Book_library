@@ -30,25 +30,38 @@ export async function fetchBooks(opts: FetchBooksOpts = {}): Promise<BookView[]>
     limit,
   } = opts;
 
-  let query = supabase
-    .from("books")
-    .select("*, book_copies(*)")
-    .eq("is_archived", false);
+  let data;
+  let error;
 
   if (search) {
-    query = query.textSearch("fts", search, { type: "websearch", config: "english" });
+    // Use the ranked search function for relevance-ordered results
+    const res = await supabase
+      .rpc("search_books", {
+        search_query: search,
+        genre_filter: genre ?? null,
+      })
+      .select("*, book_copies(*)");
+
+    data = res.data;
+    error = res.error;
+  } else {
+    // No search — standard query with sort
+    let query = supabase
+      .from("books")
+      .select("*, book_copies(*)")
+      .eq("is_archived", false);
+
+    if (genre) {
+      query = query.eq("genre", genre);
+    }
+
+    query = query.order(sortField, { ascending: sortDir === "asc" });
+    query = query.limit(limit ?? 100);
+
+    const res = await query;
+    data = res.data;
+    error = res.error;
   }
-
-  if (genre) {
-    query = query.eq("genre", genre);
-  }
-
-  query = query.order(sortField, { ascending: sortDir === "asc" });
-
-  // Always cap results to avoid huge payloads (especially with nested copies)
-  query = query.limit(limit ?? 100);
-
-  const { data, error } = await query;
   if (error) throw error;
 
   let books = (data as DbBookWithCopies[]).map(toBookView);
